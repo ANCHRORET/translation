@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:id="@+id/container_parent"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@drawable/bm_color_bg"
+              android:gravity="center_horizontal"
+              android:orientation="vertical">
+
+    <!--<LinearLayout-->
+        <!--android:id="@+id/ll"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:orientation="horizontal"-->
+        <!--android:descendantFocusability="afterDescendants"-->
+        <!--android:layout_height="match_parent">-->
+
+        <!--<android.support.v17.leanback.widget.VerticalGridView-->
+            <!--android:id="@+id/hgv1"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:clipToPadding="false"-->
+            <!--style="@style/TestHorizontalGridView"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:layout_marginTop="324px"/>-->
+            <!--&lt;!&ndash;style="?attr/rowHorizontalGridStyle"&ndash;&gt;-->
+    <!--</LinearLayout>-->
+
+
+    <!--<android.support.v17.leanback.widget.VerticalGridView-->
+    <!--android:id="@+id/hgv2"-->
+    <!--android:layout_width="0dp"-->
+    <!--android:layout_weight="1"-->
+    <!--android:layout_height="match_parent"/>-->
+</LinearLayout>

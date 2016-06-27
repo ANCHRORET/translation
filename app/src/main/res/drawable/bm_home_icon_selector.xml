@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+<!--     <item android:drawable="@drawable/bm_home_icon_checked" android:state_checked="true" android:state_focused="true"/> -->
+<!--     <item android:drawable="@drawable/bm_home_icon_checked" android:state_checked="true"/> -->
+<!--     <item android:drawable="@drawable/bm_home_icon"/> -->
+
+    <!--<item android:drawable="@drawable/bm_home_icon_checked" android:state_focused="true" android:state_selected="true"/>-->
+    <item android:drawable="@drawable/bm_home_icon_checked" android:state_focused="true" android:state_selected="true"/>
+    <item android:drawable="@drawable/bm_home_icon_selected" android:state_selected="true"/>
+    <item android:drawable="@drawable/bm_home_icon_normal"/>
+</selector>
