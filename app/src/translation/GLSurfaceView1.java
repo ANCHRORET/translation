@@ -39,20 +39,29 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 /**
+ * 翻译参考<a></>http://blog.csdn.net/chenjie19891104/article/details/6311209</a>
  * An implementation of SurfaceView that uses the dedicated surface for
  * displaying OpenGL rendering.
+ * SurfaceView的一个实现，这个类使用专用的Surface来展示OpenGL的渲染
  * <p>
  * A GLSurfaceView provides the following features:
+ * GLSurfaceView提供了下列参数
  * <p>
  * <ul>
  * <li>Manages a surface, which is a special piece of memory that can be
  * composited into the Android view system.
+ * 管理一个Surface，这个Surface使用一块特殊的内存，可以直接将这块内存的内容组合到view上来显示
  * <li>Manages an EGL display, which enables OpenGL to render into a surface.
+ * 管理一个EGL display,使得OpenGL直接渲染在Surface上
  * <li>Accepts a user-provided Renderer object that does the actual rendering.
+ * 接收一个用户提供的Renderer对象，这个对象实际上负责渲染
  * <li>Renders on a dedicated thread to decouple rendering performance from the
  * UI thread.
+ * 渲染器使用一个专用的线程来独立完成渲染的操作，和UI线程分离
  * <li>Supports both on-demand and continuous rendering.
+ * 支持两种模式，on-demand(按需)和continuous(连续)渲染
  * <li>Optionally wraps, traces, and/or error-checks the renderer's OpenGL calls.
+ * 可以选择包裹，路径和错误检查等渲染器的OpenGL的调用
  * </ul>
  *
  * <div class="special reference">
@@ -62,6 +71,7 @@ import android.view.SurfaceView;
  * </div>
  *
  * <h3>Using GLSurfaceView</h3>
+ * 如何使用GLSurfaceView:
  * <p>
  * Typically you use GLSurfaceView by subclassing it and overriding one or more of the
  * View system input event methods. If your application does not need to override event
@@ -70,53 +80,80 @@ import android.view.SurfaceView;
  * For example, unlike a regular View, drawing is delegated to a separate Renderer object which
  * is registered with the GLSurfaceView
  * using the {@link #setRenderer(Renderer)} call.
+ * 一般的使用方式是，继承GLSurfaceView，重载一些和用户输入事件有关的方法。如果你的应用不需要重载这些方法，
+ * 直接使用GLSurfaceView也可以。通常通过设置渲染器来自定义GLSurfaceView的行为而不是通过子类实现。例如：不像
+ * 普通的View，绘画操作委托给了一个独立的渲染器对象，这个对象通过setRender(Renderer)方法注册进GLSurfaceView
  * <p>
  * <h3>Initializing GLSurfaceView</h3>
+ * 初始化GLSurfaceView
  * All you have to do to initialize a GLSurfaceView is call {@link #setRenderer(Renderer)}.
  * However, if desired, you can modify the default behavior of GLSurfaceView by calling one or
  * more of these methods before calling setRenderer:
+ * 你只需要通过setRenderer(Renderer)给GLSurfaceView注册一个渲染器即可。如果需要，亦可以修改一些默认的属性
+ * 来定制GLSurfaceView的行为，在调用setRenderer方法前调用下面的放啊发
  * <ul>
- * <li>{@link #setDebugFlags(int)}
- * <li>{@link #setEGLConfigChooser(boolean)}
+ * <li>{@link #setDebugFlags(int)}设置调试标记
+ * <li>{@link #setEGLConfigChooser(boolean)}设置EGLConfigChooser
  * <li>{@link #setEGLConfigChooser(EGLConfigChooser)}
  * <li>{@link #setEGLConfigChooser(int, int, int, int, int, int)}
- * <li>{@link #setGLWrapper(GLWrapper)}
+ * <li>{@link #setGLWrapper(GLWrapper)}设置GLWrapper
  * </ul>
  * <p>
  * <h4>Specifying the android.view.Surface</h4>
+ * 特定的Surface
  * By default GLSurfaceView will create a PixelFormat.RGB_888 format surface. If a translucent
  * surface is required, call getHolder().setFormat(PixelFormat.TRANSLUCENT).
  * The exact format of a TRANSLUCENT surface is device dependent, but it will be
  * a 32-bit-per-pixel surface with 8 bits per component.
+ * GLSurfaceView默认创建PixelFormat.RGB_888格式的surface，如果你需要有透明度的Surface，调用
+ * getHolder().setFormat(PixelFormat.TRANSLUCENT)来重新设置。透明格式的Surface的像素格式都是32位的，
+ * 每个色彩单元占用8bit,整个像素格式是设备相关的，可能是ARGB,RGBA或其他
  * <p>
  * <h4>Choosing an EGL Configuration</h4>
+ * 选择一个EGL参数
  * A given Android device may support multiple EGLConfig rendering configurations.
  * The available configurations may differ in how may channels of data are present, as
  * well as how many bits are allocated to each channel. Therefore, the first thing
  * GLSurfaceView has to do when starting to render is choose what EGLConfig to use.
+ * 一个设备可能支持多种EGLConfig渲染参数。根据数据展示占用的通道数（我猜测ARGB是四个通道，rgb是三个通道）
+ * 以及每个通道占用的比特数（888,656），需要设置的参数可能是不同的。因此，GLSurfaceView开始渲染之前，要先
+ * 选择一种EGL参数。
  * <p>
  * By default GLSurfaceView chooses a EGLConfig that has an RGB_888 pixel format,
  * with at least a 16-bit depth buffer and no stencil.
+ * GLSurfaceView默认使用的EGL参数是，RGB_888的像素格式，最低16-bit的深度缓存，没有模板（遮罩缓存）
+ *
  * <p>
  * If you would prefer a different EGLConfig
  * you can override the default behavior by calling one of the
  * setEGLConfigChooser methods.
+ * 如果你需要其他不同的EGL参数设置，你可以调用setEGLConfigChooser方法的一种来改变默认设置
  * <p>
  * <h4>Debug Behavior</h4>
  * You can optionally modify the behavior of GLSurfaceView by calling
  * one or more of the debugging methods {@link #setDebugFlags(int)},
  * and {@link #setGLWrapper}. These methods may be called before and/or after setRenderer, but
  * typically they are called before setRenderer so that they take effect immediately.
+ * 默认的行为
+ * 你可以通过调用setDebugFlags(int)或者setGLWrapper（）来自定义GLSurfaceView的行为。这些方法可以在setRenderer()方法
+ * 之前或者之后调用，一般在setRenderer()方法之前调用，这样这些设置的参数就可以马上起作用
  * <p>
  * <h4>Setting a Renderer</h4>
  * Finally, you must call {@link #setRenderer} to register a {@link Renderer}.
  * The renderer is
  * responsible for doing the actual OpenGL rendering.
+ * 设置一个渲染器
+ * 最后，你必须调用setRenderer()方法给GLSurfaceView注册一个Renderer。这个渲染器负责实际的
+ * OpenGL的渲染工作。
  * <p>
  * <h3>Rendering Mode</h3>
  * Once the renderer is set, you can control whether the renderer draws
  * continuously or on-demand by calling
  * {@link #setRenderMode}. The default is continuous rendering.
+ * 渲染模式
+ * Renderer设置之后，你就可以通过setRenderMode(int)方法设置这个渲染器是Continuous模式还是on-demand模式
+ * 默认是continuous渲染模式
+ *
  * <p>
  * <h3>Activity Life-cycle</h3>
  * A GLSurfaceView must be notified when the activity is paused and resumed. GLSurfaceView clients
@@ -124,8 +161,12 @@ import android.view.SurfaceView;
  * {@link #onResume()} when the activity resumes. These calls allow GLSurfaceView to
  * pause and resume the rendering thread, and also allow GLSurfaceView to release and recreate
  * the OpenGL display.
+ * Activity的生命周期
+ * 当activity暂停和恢复时，要通知到GLSurfaceView。activity暂停时，GLSurfaceView对象的onPause()方法要被调用
+ * activity恢复时，GLSurfaceView的onResume（）方法要被调用。
  * <p>
  * <h3>Handling events</h3>
+ * 事件处理
  * <p>
  * To handle an event you will typically subclass GLSurfaceView and override the
  * appropriate method, just as you would with any other View. However, when handling
@@ -134,6 +175,9 @@ import android.view.SurfaceView;
  * standard Java cross-thread communication mechanism. In addition,
  * one relatively easy way to communicate with your renderer is
  * to call
+ * 为了处理用户事件，一般是继承GLSurfaceView，重载合适的方法，就像你使用其他的view一样。然而，当你处理这些用户事件的时候
+ * 你需要与运行在特定渲染线程的的渲染器对象进行数据传递。可以通过java的线程间通讯机制来操作。另外，进行通讯的一个相对简单的方法是
+ * 调用渲染器的queueEvent(Runnable)的方法。下面是一个使用的示例：
  * {@link #queueEvent(Runnable)}. For example:
  * <pre class="prettyprint">
  * class MyGLSurfaceView extends GLSurfaceView {
@@ -159,6 +203,10 @@ import android.view.SurfaceView;
  *     }
  * }
  * </pre>
+ *
+ * (注：如果在UI线程里调用渲染器的方法，很容易收到“call to OpenGL ES API with no current context”的警告，
+ * 典型的误区就是在键盘或鼠标事件方法里直接调用opengl es的API，因为UI事件和渲染绘制在不同的线程里。更甚者，
+ * 这种情况下调用glDeleteBuffers这种释放资源的方法，可能引起程序的崩溃， 因为UI线程想释放它，渲染线程却要使用它。)
  *
  */
 public class GLSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
