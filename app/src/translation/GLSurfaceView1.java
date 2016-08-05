@@ -221,6 +221,7 @@ public class GLSurfaceView extends SurfaceView implements SurfaceHolder.Callback
     /**
      * The renderer only renders
      * when the surface is created, or when {@link #requestRender} is called.
+     * 此模式下：只有Surface创建的时候，后者requestRender（）方法调用的时候，渲染器会进行重绘
      *
      * @see #getRenderMode()
      * @see #setRenderMode(int)
@@ -230,6 +231,7 @@ public class GLSurfaceView extends SurfaceView implements SurfaceHolder.Callback
     /**
      * The renderer is called
      * continuously to re-render the scene.
+     * 此模式下：渲染器会连续重绘
      *
      * @see #getRenderMode()
      * @see #setRenderMode(int)
@@ -240,6 +242,7 @@ public class GLSurfaceView extends SurfaceView implements SurfaceHolder.Callback
      * Check glError() after every GL call and throw an exception if glError indicates
      * that an error has occurred. This can be used to help track down which OpenGL ES call
      * is causing an error.
+     * 在GL调用之后，并且glError指定的错误出现，抛出异常的时候，会调用glError()检查。
      *
      * @see #getDebugFlags
      * @see #setDebugFlags
@@ -248,6 +251,7 @@ public class GLSurfaceView extends SurfaceView implements SurfaceHolder.Callback
 
     /**
      * Log GL calls to the system log at "verbose" level with tag "GLSurfaceView".
+     * 会有指定的log出现
      *
      * @see #getDebugFlags
      * @see #setDebugFlags
@@ -257,6 +261,7 @@ public class GLSurfaceView extends SurfaceView implements SurfaceHolder.Callback
     /**
      * Standard View constructor. In order to render something, you
      * must call {@link #setRenderer} to register a renderer.
+     * 为了渲染图像，必须调用setRenderer（）注册一个渲染器
      */
     public GLSurfaceView(Context context) {
         super(context);
@@ -266,6 +271,7 @@ public class GLSurfaceView extends SurfaceView implements SurfaceHolder.Callback
     /**
      * Standard View constructor. In order to render something, you
      * must call {@link #setRenderer} to register a renderer.
+     * 必须调用setRenderer()方法注册一个渲染器
      */
     public GLSurfaceView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -278,6 +284,7 @@ public class GLSurfaceView extends SurfaceView implements SurfaceHolder.Callback
             if (mGLThread != null) {
                 // GLThread may still be running if this view was never
                 // attached to a window.
+                // view脱离window的时候，绘制线程可能仍在运行
                 mGLThread.requestExitAndWait();
             }
         } finally {
@@ -288,15 +295,20 @@ public class GLSurfaceView extends SurfaceView implements SurfaceHolder.Callback
     private void init() {
         // Install a SurfaceHolder.Callback so we get notified when the
         // underlying surface is created and destroyed
+        // 注册一些监听器，这样底层的Surface创建和销毁的时候，可以接到提醒
         SurfaceHolder holder = getHolder();
         holder.addCallback(this);
         // setFormat is done by SurfaceView in SDK 2.3 and newer. Uncomment
         // this statement if back-porting to 2.2 or older:
         // holder.setFormat(PixelFormat.RGB_565);
+        // 在sdk2.3之后，setFormat方法会被SurfaceView默认调用，在2.2之前不用在意这个
+        // 这个状态，那事使用的是PixelFormat.RGB_565的状态
         //
         // setType is not needed for SDK 2.0 or newer. Uncomment this
         // statement if back-porting this code to older SDKs.
         // holder.setType(SurfaceHolder.SURFACE_TYPE_GPU);
+        // sdk2.0之后，setType()方法无效。在之前的版本中，不用子阿姨这个状态，
+        // 使用默认的SurfaceHolder.SURFACE_TYPE_GPU的状态
     }
 
     /**
@@ -306,10 +318,14 @@ public class GLSurfaceView extends SurfaceView implements SurfaceHolder.Callback
      * the GL object that's passed to the renderer. Wrapping a GL
      * object enables examining and modifying the behavior of the
      * GL calls made by the renderer.
+     * 设置一个glWraper。如果不为空，当Surface创建的时候，此GLWrapper的方法wrap(GL)会被调用
+     * GLWrapper会包装含有renderer的GL对象。
      * <p>
      * Wrapping is typically used for debugging purposes.
+     * 包装一般用于调试目的
      * <p>
      * The default value is null.
+     * 默认为null
      * @param glWrapper the new GLWrapper
      */
     public void setGLWrapper(GLWrapper glWrapper) {
@@ -321,6 +337,8 @@ public class GLSurfaceView extends SurfaceView implements SurfaceHolder.Callback
      * constructed by OR-together zero or more
      * of the DEBUG_CHECK_* constants. The debug flags take effect
      * whenever a surface is created. The default value is zero.
+     * 设置debug的标志位。这个值是0或者其他的DEBUG_CHECK_开头的常量。
+     * 这个标志位在Surface创建的时候起作用。默认值是0
      * @param debugFlags the new debug flags
      * @see #DEBUG_CHECK_GL_ERROR
      * @see #DEBUG_LOG_GL_CALLS
@@ -331,6 +349,7 @@ public class GLSurfaceView extends SurfaceView implements SurfaceHolder.Callback
 
     /**
      * Get the current value of the debug flags.
+     * 获得当前的测试标志位
      * @return the current value of the debug flags.
      */
     public int getDebugFlags() {
@@ -340,20 +359,27 @@ public class GLSurfaceView extends SurfaceView implements SurfaceHolder.Callback
     /**
      * Control whether the EGL context is preserved when the GLSurfaceView is paused and
      * resumed.
+     * 当GLSurfaceView暂停或恢复时，控制EGL context是否保留
      * <p>
      * If set to true, then the EGL context may be preserved when the GLSurfaceView is paused.
      * Whether the EGL context is actually preserved or not depends upon whether the
      * Android device that the program is running on can support an arbitrary number of EGL
      * contexts or not. Devices that can only support a limited number of EGL contexts must
      * release the  EGL context in order to allow multiple applications to share the GPU.
+     * 如果设置为true，EGL context会在GLSurfaceView处在暂停状态时保留。EGL context 保留与否取决于这个设备在
+     * 进程运行时能否支持任意数量的EGL context。如果设备只能支持一定数量的EGL context,那么为了允许多个应用
+     * 共享GPU，就需要释放EGL context
      * <p>
      * If set to false, the EGL context will be released when the GLSurfaceView is paused,
      * and recreated when the GLSurfaceView is resumed.
+     * 如果设置为false，EGL context在GLSurfaceView暂停时释放，当GLSurfaceView恢复的时候重建
      * <p>
      *
      * The default is false.
+     * 默认为false
      *
      * @param preserveOnPause preserve the EGL context when paused
+     *
      */
     public void setPreserveEGLContextOnPause(boolean preserveOnPause) {
         mPreserveEGLContextOnPause = preserveOnPause;
@@ -371,8 +397,11 @@ public class GLSurfaceView extends SurfaceView implements SurfaceHolder.Callback
      * will call the renderer, which in turn causes the rendering to start.
      * <p>This method should be called once and only once in the life-cycle of
      * a GLSurfaceView.
+     * 给此View设置一个渲染器。也会打开渲染器的线程，这个动作反过来触发渲染开始，
+     * 这个方法在GLSurfaceView的生命周期里仅应该被调用一次
      * <p>The following GLSurfaceView methods can only be called <em>before</em>
      * setRenderer is called:
+     * 下列GLSurfaceView的方法应该在setRenderer()方法调用之前调用
      * <ul>
      * <li>{@link #setEGLConfigChooser(boolean)}
      * <li>{@link #setEGLConfigChooser(EGLConfigChooser)}
@@ -381,6 +410,7 @@ public class GLSurfaceView extends SurfaceView implements SurfaceHolder.Callback
      * <p>
      * The following GLSurfaceView methods can only be called <em>after</em>
      * setRenderer is called:
+     * 下列方法只能在setRenderer()方法之后调用
      * <ul>
      * <li>{@link #getRenderMode()}
      * <li>{@link #onPause()}
@@ -391,6 +421,7 @@ public class GLSurfaceView extends SurfaceView implements SurfaceHolder.Callback
      * </ul>
      *
      * @param renderer the renderer to use to perform OpenGL drawing.
+     *                 实现OpenGL绘制的渲染器
      */
     public void setRenderer(Renderer renderer) {
         checkRenderThreadState();
@@ -410,13 +441,18 @@ public class GLSurfaceView extends SurfaceView implements SurfaceHolder.Callback
 
     /**
      * Install a custom EGLContextFactory.
+     * 安装一个自定义的EGLContextFactory
      * <p>If this method is
      * called, it must be called before {@link #setRenderer(Renderer)}
      * is called.
+     * 如果需要调用这个方法，必须要在setRenderer(Renderer)之前调用
      * <p>
      * If this method is not called, then by default
      * a context will be created with no shared context and
      * with a null attribute list.
+     * 如果没有设置EGLContextFactory,会创建一个默认的context，这个context
+     * 不是共享的，而且带有一个空的attribute list
+     *
      */
     public void setEGLContextFactory(EGLContextFactory factory) {
         checkRenderThreadState();
@@ -425,12 +461,16 @@ public class GLSurfaceView extends SurfaceView implements SurfaceHolder.Callback
 
     /**
      * Install a custom EGLWindowSurfaceFactory.
+     * 安装一个自定义的EGLWindowSurfaceFactory。
      * <p>If this method is
      * called, it must be called before {@link #setRenderer(Renderer)}
      * is called.
+     * 如果需要调用这个方法，必须要在setRenderer(Renderer)方法之前调用
      * <p>
      * If this method is not called, then by default
      * a window surface will be created with a null attribute list.
+     * 如果这个方法没有被调用，一个默认的window surface会被创建，这个surface
+     * 带有一个空的属性列表
      */
     public void setEGLWindowSurfaceFactory(EGLWindowSurfaceFactory factory) {
         checkRenderThreadState();
@@ -439,14 +479,18 @@ public class GLSurfaceView extends SurfaceView implements SurfaceHolder.Callback
 
     /**
      * Install a custom EGLConfigChooser.
+     * 安装一个自定义的EGLConfigChooser
      * <p>If this method is
      * called, it must be called before {@link #setRenderer(Renderer)}
      * is called.
+     * 这个方法如果调用，必须在setRenderer(Renderer)之前调用
      * <p>
      * If no setEGLConfigChooser method is called, then by default the
      * view will choose an EGLConfig that is compatible with the current
      * android.view.Surface, with a depth buffer depth of
      * at least 16 bits.
+     * 如果没有设置，会默认选择一个兼容当前Surface的EGLConfig,带有一个深度的buffer
+     * 深度最少16bit
      * @param configChooser
      */
     public void setEGLConfigChooser(EGLConfigChooser configChooser) {
@@ -458,6 +502,8 @@ public class GLSurfaceView extends SurfaceView implements SurfaceHolder.Callback
      * Install a config chooser which will choose a config
      * as close to 16-bit RGB as possible, with or without an optional depth
      * buffer as close to 16-bits as possible.
+     * 安装一个config chooser,选择一个最接近16bitRGB的参数,无论有没有深度缓存，尽可能的接近
+     * 16bit
      * <p>If this method is
      * called, it must be called before {@link #setRenderer(Renderer)}
      * is called.
@@ -494,7 +540,9 @@ public class GLSurfaceView extends SurfaceView implements SurfaceHolder.Callback
     /**
      * Inform the default EGLContextFactory and default EGLConfigChooser
      * which EGLContext client version to pick.
+     * 通知默认的EGLContextFactory和默认的EGLConfigChooser，选择哪一个EGLContext客户端版本
      * <p>Use this method to create an OpenGL ES 2.0-compatible context.
+     * 使用这个方法创建一个OpenGL ES 2.0兼容的context
      * Example:
      * <pre class="prettyprint">
      *     public MyView(Context context) {
@@ -506,6 +554,8 @@ public class GLSurfaceView extends SurfaceView implements SurfaceHolder.Callback
      * <p>Note: Activities which require OpenGL ES 2.0 should indicate this by
      * setting @lt;uses-feature android:glEsVersion="0x00020000" /> in the activity's
      * AndroidManifest.xml file.
+     * 注意：使用OpenGL ES 2.0应该在清单文件里面加入这个用户属性
+     * uses-feature android:glEsVersion="0x00020000"
      * <p>If this method is called, it must be called before {@link #setRenderer(Renderer)}
      * is called.
      * <p>This method only affects the behavior of the default EGLContexFactory and the
@@ -515,7 +565,14 @@ public class GLSurfaceView extends SurfaceView implements SurfaceHolder.Callback
      * If
      * {@link #setEGLConfigChooser(EGLConfigChooser)} has been called, then the supplied
      * EGLConfigChooser is responsible for choosing an OpenGL ES 2.0-compatible config.
+     * 这个方法仅仅影响默认EGLContextFactory和默认EGLConfigChooser的默认行为。
+     * 如果setEGLContextFactory(EGLContextFactory)被调用，这个提供的EGLContextFactory有责任自己提供
+     * 一个兼容的OpenGL ES 2.0的Context。
+     * 如果setEGLConfigChooser(EGLConfigChooser)被调用，这个提供的EGLConfigChooser有责任自己选择一个兼容的
+     * OpenGL ES 2.0的属性
+     *
      * @param version The EGLContext client version to choose. Use 2 for OpenGL ES 2.0
+     *                2会选择OpenGL ES 2.0
      */
     public void setEGLContextClientVersion(int version) {
         checkRenderThreadState();
